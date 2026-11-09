@@ -2,7 +2,7 @@
 
 Local Decision Framework (LDF) as a DSH host plugin. Requires DSH `>=0.2 <0.3`, Node.js `>=22`, and Python `>=3.10` with the upstream `mcp` dependency installed. This MVP was verified against the local DSH SDK at `0.2.2-alpha.2`; the declared engine range is compatibility intent, not evidence that every historical 0.2 release has the required volatile-settings API.
 
-The upstream implementation is a Git submodule at `upstream/`, pinned by the parent repository. All DSH adaptation lives in `src/index.js`; no upstream source files are copied or patched. The bundle patch mounts the host plugin; DSH's native SettingsForms projection exposes every plugin field. No web bundle or DSH source changes are needed.
+The upstream implementation is a Git submodule at `upstream/`, pinned by the parent repository. All DSH adaptation lives in `src/index.js`; no upstream source files are copied or patched. The bundle patch mounts the host plugin, and `src/client.js` provides its settings form in DSH's plugin settings slot without depending on an optional host UI primitives package.
 
 ## Setup
 
@@ -62,7 +62,7 @@ npm pack --dry-run --json
 
 The integration test composes the actual Cordis Loader, DSH system prompt, ToolRuntime, native executor and native MCP client. It launches the real upstream Python stdio server and sends a claim through DSH to a controlled loopback provider. It verifies the verdict and configured model/URL, live namespace changes, old-tool removal, edited prompt text and disable cleanup. It requires the SDK development dependencies and creates/removes its data directory inside this repository. It needs neither API keys nor an external model. A second test boots a disposable DSH profile with the real SettingsForms and ConfigEditor services: every option appears in the generated form, saves persist to the profile patch, invalid saves leave it unchanged, and a fresh boot restores the saved values. The next actual MCP call uses the saved model.
 
-Observed local validation: the integration test passes against DSH `0.2.2-alpha.2`, Node `26.13.0`, Python `3.15`, and Python MCP `1.30.0`. The running user's DSH profile was not changed: rendered settings UI, real hosted-provider authentication and compatibility with other 0.2 builds remain unverified. `npm pack --dry-run` checks archive contents only. GitHub source publication does not imply publication to the npm registry.
+Observed local validation: the integration test passes against DSH `0.2.2-alpha.2`, Node `26.13.0`, Python `3.15`, and Python MCP `1.30.0`. In a running DSH Web profile, the bundled settings form rendered and a saved prompt-suffix change remained after leaving and reopening the panel; the original empty suffix was then restored. The installed `mcp__ldf__ldf_check_claim` tool registered, but its live smoke call returned `provider_or_protocol_error` because the default local endpoint at `127.0.0.1:11434` was not listening. Real hosted-provider authentication and compatibility with other 0.2 builds remain unverified. `npm pack --dry-run` checks archive contents only. GitHub source publication does not imply publication to the npm registry.
 
 ## Licensing and submodule maintenance
 
