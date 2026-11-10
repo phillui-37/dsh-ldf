@@ -4,6 +4,53 @@ Local Decision Framework (LDF) as a DSH host plugin. Requires DSH `>=0.2 <0.3`, 
 
 The upstream implementation is a Git submodule at `upstream/`, pinned by the parent repository. All DSH adaptation lives in `src/`; no upstream source files are copied or patched. The bundle patch mounts the host plugin, and `src/client.js` provides its settings form in DSH's plugin settings slot without depending on an optional host UI primitives package.
 
+English · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+
+## How it works
+
+While enabled, the plugin registers guidance and host tools; the native DSH MCP client keeps its Python server available. Claim checks, model discovery, and model setup run only when their tools are called. Model setup proceeds only after the user approves the exact provider, model, and format. The plugin does not check claims automatically in the background.
+
+### Architecture
+
+```mermaid
+flowchart LR
+    Host["DSH host"] --> Plugin["dsh-ldf plugin: prompt and host tools"]
+    Plugin --> MCP["Native DSH MCP client"] --> Server["Pinned Python MCP server over stdio"]
+    Server --> Endpoint["Configured chat-completions endpoint"]
+    Server --> Receipts["Local LDF receipts"]
+    Plugin --> LocalTools["Node local-model tools"] --> Runtime["Ollama or LM Studio on loopback"]
+    LocalTools -. approved setup updates .-> Settings["DSH settings"]
+    Settings -. replaces MCP child .-> MCP
+```
+
+### Operation flow
+
+```mermaid
+flowchart TD
+    Enabled["Plugin enabled"] --> Start["Register guidance and local-model tools; start Python MCP server"]
+    Start --> Request{"Tool request?"}
+    Request -->|No request| Idle["Server waits; no claim is checked"]
+    Request -->|Claim check| Claim["Validate claim and evidence"]
+    Claim --> Evidence{"Evidence supplied?"}
+    Evidence -->|No| Abstain["Abstain locally; no provider call"]
+    Evidence -->|Yes| CallAPI["Call configured /chat/completions endpoint"]
+    CallAPI --> Receipt["Validate verdict and citations; write local receipt"]
+    Abstain --> Result["Return tool result"]
+    Receipt --> Result
+    Request -->|Discovery| Discovery["Read-only loopback and CLI inventory"]
+    Discovery --> Result
+    Request -->|Setup| Approval{"Exact provider, model, and format approved (confirmed: true)?"}
+    Approval -->|No| Stop["No setup; return confirmation required"]
+    Stop --> Result
+    Approval -->|Yes| Configure["Configure loopback runtime; download or load model"]
+    Configure --> Verify{"Model visible through /v1/models?"}
+    Verify -->|No| Partial["Report failure; partial model or service may remain"]
+    Partial --> Result
+    Verify -->|Yes| Update["Update baseUrl and model settings"]
+    Update --> Restart["Restart MCP connection with new settings"]
+    Restart --> Result
+```
+
 ## Setup
 
 ```sh

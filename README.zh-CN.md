@@ -4,7 +4,52 @@ Local Decision Framework（LDF）的 DeepSeek Harness 主机插件。需要 DSH 
 
 上游实现位于 Git 子模块 `upstream/`，由父仓库固定版本。所有 DSH 适配都在 `src/`，不会复制或修改上游源码。套件补丁会挂载主机插件；`src/client.js` 在 DSH 外挂设置页提供表单，不依赖可选的主机 UI 组件包。
 
-[English](README.md) · [繁體中文](README.zh-TW.md)
+[English](README.md) · 简体中文 · [繁體中文](README.zh-TW.md)
+
+## 工作原理
+
+插件启用时会注册提示词和主机工具；DSH 原生 MCP 客户端会让 Python 服务保持可用。主张检查、模型发现和模型设置只在调用相应工具时执行；模型设置必须先由用户批准精确的 provider、model 和 format。插件不会在后台自动检查主张。
+
+### 架构图
+
+```mermaid
+flowchart LR
+    Host["DSH 主机"] --> Plugin["dsh-ldf 插件：提示词和主机工具"]
+    Plugin --> MCP["DSH 原生 MCP 客户端"] --> Server["固定版本 Python MCP 服务：stdio"]
+    Server --> Endpoint["已配置的 chat-completions 端点"]
+    Server --> Receipts["本地 LDF 收据"]
+    Plugin --> LocalTools["Node 本地模型工具"] --> Runtime["仅绑定本机回环地址的 Ollama 或 LM Studio"]
+    LocalTools -. 获批准的设置会更新 .-> Settings["DSH 设置"]
+    Settings -. 重建 MCP 子进程 .-> MCP
+```
+
+### 操作流程
+
+```mermaid
+flowchart TD
+    Enabled["启用插件"] --> Start["注册提示词与本机模型工具；启动 Python MCP 服务"]
+    Start --> Request{"收到工具请求？"}
+    Request -->|没有请求| Idle["服务待命；不会自动检查主张"]
+    Request -->|检查主张| Claim["验证主张与证据"]
+    Claim --> Evidence{"是否提供证据？"}
+    Evidence -->|否| Abstain["不调用 provider，直接弃权"]
+    Evidence -->|是| CallAPI["调用已配置的 /chat/completions 端点"]
+    CallAPI --> Receipt["验证判定和引用；写入本地收据"]
+    Abstain --> Result["返回工具结果"]
+    Receipt --> Result
+    Request -->|发现模型| Discovery["只读盘点本机服务与 CLI"]
+    Discovery --> Result
+    Request -->|设置模型| Approval{"已明确批准准确的 provider、model 和 format (confirmed: true)？"}
+    Approval -->|否| Stop["不执行设置；要求确认"]
+    Stop --> Result
+    Approval -->|是| Configure["配置本机回环服务；下载或载入模型"]
+    Configure --> Verify{"/v1/models 可见该模型？"}
+    Verify -->|否| Partial["报告失败；可能有部分模型或服务留存"]
+    Partial --> Result
+    Verify -->|是| Update["更新 baseUrl 和 model 设置"]
+    Update --> Restart["用新设置重启 MCP 连接"]
+    Restart --> Result
+```
 
 ## 安装与设置
 
