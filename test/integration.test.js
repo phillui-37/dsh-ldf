@@ -30,6 +30,7 @@ test('real Loader + native MCP + upstream judge + live settings and disposal', {
     await ctx.plugin(SystemPrompt)
     await ctx.plugin(ToolRuntime)
     await ctx.plugin(NativeToolExecutor)
+    ctx.provide('settings', { update: async () => { throw new Error('Unexpected settings update during MCP integration test') } })
     ctx.loader.builtins.ldf = plugin
     const config = { python: process.env.LDF_TEST_PYTHON || resolve('.venv/bin/python'), baseUrl: `http://127.0.0.1:${server.address().port}/v1`, model: 'fixture-judge', dataDir, prefix: 'PREFIX_CHECK', suffix: 'SUFFIX_CHECK' }
     const id = await ctx.loader.create({ name: 'cordis:ldf', config })

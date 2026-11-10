@@ -58,9 +58,10 @@ test('SettingsForms saves all LDF settings through a temporary profile and resto
     })
     ctx = await start()
     const describe = () => ctx.settings.describe().find(row => row.ns === 'ldf')
-    const fields = ['enabled', 'python', 'serverName', 'baseUrl', 'model', 'apiKeyFile', 'timeout', 'maxOutputTokens', 'reasoningEffort', 'outputMode', 'clientName', 'capture', 'captureResponse', 'dataDir', 'toolCallTimeoutMs', 'prefix', 'suffix']
+    const fields = ['enabled', 'python', 'serverName', 'baseUrl', 'model', 'apiKeyFile', 'timeout', 'maxOutputTokens', 'reasoningEffort', 'outputMode', 'clientName', 'capture', 'captureResponse', 'dataDir', 'toolCallTimeoutMs', 'followUpstreamSkill', 'prefix', 'suffix']
     const { schema } = describe()
     assert.deepEqual(Object.keys(schema.refs[schema.uid].dict).sort(), fields.sort())
+    assert.equal(describe().value.followUpstreamSkill, false)
     assert.deepEqual(Object.keys(describe().value).sort(), fields)
     assert.equal(describe().value.model, 'initial-judge')
 
