@@ -1,5 +1,7 @@
 # dsh-ldf
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/phillui-37-dsh-ldf-11hrnh)](https://m8ven.ai/mcp/phillui-37-dsh-ldf-11hrnh?s=readme)
+
 Local Decision Framework (LDF) as a DSH host plugin. Requires DSH `>=0.2 <0.3`, Node.js `>=22`, and Python `>=3.10` with the upstream `mcp` dependency installed. This MVP was verified against the local DSH SDK at `0.2.2-alpha.2`; the declared engine range is compatibility intent, not evidence that every historical 0.2 release has the required volatile-settings API.
 
 The upstream implementation is a Git submodule at `upstream/`, pinned by the parent repository. All DSH adaptation lives in `src/`; no upstream source files are copied or patched. The bundle patch mounts the host plugin, and `src/client.js` provides its settings form in DSH's plugin settings slot without depending on an optional host UI primitives package.

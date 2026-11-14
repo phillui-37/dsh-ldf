@@ -1,5 +1,7 @@
 # dsh-ldf
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/phillui-37-dsh-ldf-11hrnh)](https://m8ven.ai/mcp/phillui-37-dsh-ldf-11hrnh?s=readme)
+
 Local Decision Framework（LDF）的 DeepSeek Harness 主機外掛。需要 DSH `>=0.2 <0.3`、Node.js `>=22`，以及安裝上游 `mcp` 相依套件的 Python `>=3.10`。此 MVP 曾使用本機 DSH SDK `0.2.2-alpha.2` 驗證；宣告的版本範圍代表相容目標，並不表示所有歷史 `0.2` 版本都具備所需的易變設定 API。
 
 上游實作位於 Git 子模組 `upstream/`，由父儲存庫固定版本。所有 DSH 整合都在 `src/`，不會複製或修改上游原始碼。套件補丁會掛載主機外掛；`src/client.js` 在 DSH 外掛設定頁提供表單，不依賴可選的主機 UI 元件套件。
