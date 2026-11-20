@@ -64,8 +64,10 @@ test('SettingsForms saves all LDF settings through a temporary profile and resto
     assert.equal(describe().value.followUpstreamSkill, false)
     assert.deepEqual(Object.keys(describe().value).sort(), fields)
     assert.equal(describe().value.model, 'initial-judge')
+    await assertJudgeModel(ctx, requests, 'initial-judge', 'initial-default')
+    assert.equal(requests.at(-1).response_format.type, 'json_schema')
 
-    const update = { model: 'saved-judge', prefix: 'SAVED_SETTINGS_PREFIX', timeout: 17 }
+    const update = { model: 'saved-judge', prefix: 'SAVED_SETTINGS_PREFIX', timeout: 17, outputMode: 'json_object' }
     await ctx.settings.update('ldf', update)
     assert.equal(describe().value.model, update.model)
     const patch = await readFile(profile.patchPath, 'utf8')
@@ -84,6 +86,7 @@ test('SettingsForms saves all LDF settings through a temporary profile and resto
     assert.equal(describe().value.timeout, update.timeout)
     assert.equal(describe().value.prefix, update.prefix)
     await assertJudgeModel(ctx, requests, 'saved-judge', 'after-restart')
+    assert.equal(requests.at(-1).response_format.type, 'json_object')
   } finally {
     if (ctx) await ctx.fiber.dispose()
     await new Promise(resolve => server.close(resolve))
