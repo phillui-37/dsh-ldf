@@ -24,7 +24,7 @@ export const Config = z.object({
   timeout: z.number().min(1).max(300).default(30).volatile(),
   maxOutputTokens: z.number().step(1).min(1).max(8192).default(1200).volatile(),
   reasoningEffort: z.string().default('').volatile(),
-  outputMode: z.union(['json_schema', 'json_object', 'plain']).default('json_object').volatile(),
+  outputMode: z.union(['json_schema', 'json_object', 'plain']).default('json_schema').volatile(),
   clientName: z.string().pattern(/^\S+$/).default('dsh').volatile(),
   capture: z.boolean().default(false).volatile(),
   captureResponse: z.boolean().default(false).volatile(),

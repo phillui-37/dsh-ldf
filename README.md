@@ -84,7 +84,7 @@ Every field below is editable through DSH Settings and uses its native persisted
 | `timeout` | `30` | Upstream HTTP timeout in seconds, 1–300 |
 | `maxOutputTokens` | `1200` | Provider completion budget, 1–8192 |
 | `reasoningEffort` | empty | Optional provider reasoning-effort value |
-| `outputMode` | `json_object` | `json_schema`, `json_object`, or `plain` |
+| `outputMode` | `json_schema` | `json_schema`, `json_object`, or `plain` |
 | `clientName` | `dsh` | Receipt caller label without whitespace |
 | `capture` | `false` | Retain upstream evidence input captures |
 | `captureResponse` | `false` | Retain upstream raw provider responses |

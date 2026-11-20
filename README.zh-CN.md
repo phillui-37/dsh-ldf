@@ -84,7 +84,7 @@ npm install
 | `timeout` | `30` | 上游 HTTP 超时秒数，范围 1–300 |
 | `maxOutputTokens` | `1200` | 模型回复预算，范围 1–8192 |
 | `reasoningEffort` | 空 | 可选的推理强度参数 |
-| `outputMode` | `json_object` | `json_schema`、`json_object` 或 `plain` |
+| `outputMode` | `json_schema` | `json_schema`、`json_object` 或 `plain` |
 | `clientName` | `dsh` | 收据中的调用端标签，不可含空白 |
 | `capture` | `false` | 保留上游证据输入快照 |
 | `captureResponse` | `false` | 保留上游原始模型回复 |
